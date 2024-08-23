@@ -1,21 +1,33 @@
 import mongoose from "mongoose";
-
-const connectString = `mongodb+srv://lamtienhung0412:GzobfYkp4hXUyqb2@cluster0.j93px.mongodb.net/`;
+import { countConnect } from "../helpers/check.connect.js";
+import config from "../configs/config.mongodb.js";
+const {
+  name,
+  db: { username, password, cluster },
+} = config;
+const connectString = `mongodb+srv://${username}:${password}@${cluster}`;
 
 class Database {
   constructor() {
     this.connect();
-  }s
+  }
 
-  connect() {
+  connect(type = "mongodb") {
     if (1 === 1) {
       mongoose.set("debug", true);
       mongoose.set("debug", { color: true });
     }
     mongoose
-      .connect(connectString)
-      .then((_) => console.log("Connected to mongodb"))
-      .catch((err) => console.log("Error Connected! " + err));
+      .connect(connectString, { maxPoolSize: 10 })
+      .then((_) =>
+        console.log(
+          `Connected to mongodb at ${name.toUpperCase()} mode`,
+          countConnect()
+        )
+      )
+      .catch((err) =>
+        console.log(`Error Connected! at ${name.toUpperCase()} mode ` + err)
+      );
   }
   static getInstance() {
     if (!Database.instance) {
