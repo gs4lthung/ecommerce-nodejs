@@ -10,8 +10,15 @@ const createTokenPair = async (payload, publicKey, privateKey) => {
       algorithm: "RS256",
       expiresIn: "7 days",
     });
+    jwt.verify(accessToken, publicKey, (err, decode) => {
+      if (err) {
+        console.log("Error in accessToken ", err);
+      } else {
+        console.log("decode accessToken ", decode);
+      }
+    });
     return { accessToken, refreshToken };
   } catch (error) {}
 };
 
-export default { createTokenPair };
+export { createTokenPair };

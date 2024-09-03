@@ -1,4 +1,4 @@
-import keytokenModel from "../models/keytoken.model";
+import keytokenModel from "../models/keytoken.model.js";
 
 class KeyTokenService {
   static createKeyToken = async ({ userId, publicKey }) => {
@@ -8,7 +8,7 @@ class KeyTokenService {
         user: userId,
         publicKey: publicKeyString,
       });
-      return tokens ? publicKeyString : null;
+      return tokens ? tokens.publicKey : null;
     } catch (error) {
       return {
         code: "xxx",

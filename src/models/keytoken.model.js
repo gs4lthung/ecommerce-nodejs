@@ -1,7 +1,7 @@
 import mongoose, { model, Schema } from "mongoose";
 
-const DOCUMENT_NAME = "Shop";
-const COLLECTION_NAME = "Shops";
+const DOCUMENT_NAME = "Key";
+const COLLECTION_NAME = "Keys";
 
 const keyTokenSchema = new Schema(
   {

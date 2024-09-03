@@ -10,6 +10,8 @@ app.use(morgan("dev"));
 app.use(helmet());
 app.use(compression());
 dotenv.config();
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 
 // Database
 import mongooseConnection from "./databases/init.mongodb.js";
