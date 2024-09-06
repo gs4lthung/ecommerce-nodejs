@@ -3,8 +3,7 @@ import bcrypt from "bcrypt";
 import crypto from "crypto";
 import KeyTokenService from "./keytoken.service.js";
 import { createTokenPair } from "../auth/authUtils.js";
-import { type } from "os";
-import { format } from "path";
+import { getInfoData } from "../utils/index.js";
 
 const RoleShop = {
   SHOP: "SHOP",
@@ -33,45 +32,48 @@ class AccessService {
       });
       if (newShop) {
         // create private key & public key
-        const { privateKey, publicKey } = crypto.generateKeyPairSync("rsa", {
-          modulusLength: 4096,
-          publicKeyEncoding: {
-            type: "pkcs1",
-            format: "pem",
-          },
-          privateKeyEncoding: {
-            type: "pkcs1",
-            format: "pem",
-          },
-        });
+        // const { privateKey, publicKey } = crypto.generateKeyPairSync("rsa", {
+        //   modulusLength: 4096,
+        //   publicKeyEncoding: {
+        //     type: "pkcs1",
+        //     format: "pem",
+        //   },
+        //   privateKeyEncoding: {
+        //     type: "pkcs1",
+        //     format: "pem",
+        //   },
+        // });
+        const publicKey = crypto.randomBytes(64).toString("hex");
+        const privateKey = crypto.randomBytes(64).toString("hex");
         console.log({ privateKey, publicKey }); // save collection KeyStore
-        const publicKeyString = await KeyTokenService.createKeyToken({
+        const keyStore = await KeyTokenService.createKeyToken({
           userId: newShop._id,
           publicKey: publicKey,
+          privateKey: privateKey,
         });
-        if (!publicKeyString) {
+        if (!keyStore) {
           return {
             code: "xxx",
-            message: "Error in creating public key",
+            message: "keyStore not created",
           };
         }
-
-        const publicKeyObject = crypto.createPublicKey(publicKeyString);
-
         //create token pair
         const tokens = await createTokenPair(
           {
             userId: newShop._id,
             email,
           },
-          publicKeyString,
+          publicKey,
           privateKey
         );
         console.log("Create Token Success::", tokens);
         return {
           code: 201,
           metadata: {
-            shop: newShop,
+            shop: getInfoData({
+              object: newShop,
+              fields: ["_id", "name", "email"],
+            }),
             tokens,
           },
         };
@@ -81,6 +83,7 @@ class AccessService {
         metadata: null,
       };
     } catch (error) {
+      console.log("Error in signUp::", error);
       return {
         code: "xxx",
         message: error.message,
